@@ -72,26 +72,26 @@ flowchart TD
 
 ## 📊 技能快速索引表 (Quick Reference Matrix)
 
-| 技能名稱 | 觸發方式 / 指令 | 核心功能 | 關鍵產出物 (Artifacts) | 主要連動技能 |
+| 技能名稱 | 觸發方式 / 指令 | 核心功能 | 關鍵產出物 (Artifacts) | 引用出處 / 理論依據 |
 | :--- | :--- | :--- | :--- | :--- |
-| **[`setup-matt-pocock-skills`](#1-setup-matt-pocock-skills)** | `/setup-matt-pocock-skills` | 初始化專案 Issue Tracker 與領域規範 | `docs/agents/*.md`, `AGENTS.md` | `to-spec`, `to-tickets`, `code-review` |
-| **[`to-spec`](#2-to-spec)** | `/to-spec` | 將對話脈絡轉化為完整規格與 User Stories | Spec, Issue (`ready-for-agent`) | `domain-modeling`, `codebase-design`, `to-tickets` |
-| **[`to-tickets`](#3-to-tickets)** | `/to-tickets` | 將規格拆為具備依賴關係的垂直切片工單 | `.scratch/**/issues/*.md` 或 Tracker Issues | `to-spec`, `implement`, `tdd` |
-| **[`implement`](#4-implement)** | `/implement` | 依據 Ticket/Spec 實作功能並自動串接 TDD 與審查 | 原始碼、測試、Git Commit | `tdd`, `code-review` |
-| **[`tdd`](#5-tdd)** | `/tdd`、`red-green-refactor` | 紅燈-綠燈-重構循環，鎖定公開 Seam 進行測試 | 規格化測試檔、`tests.md` | `codebase-design`, `domain-modeling`, `implement` |
-| **[`codebase-design`](#6-codebase-design)** | `/codebase-design`、`deep module` | 提供深模組（Deep Modules）與 Seams 設計詞彙與準則 | 架構介面設計、`DEEPENING.md` | `tdd`, `to-spec`, `code-review` |
-| **[`code-review`](#7-code-review)** | `/code-review`、`review since X` | 雙軸平行審查（程式碼規範 + 規格吻合度） | 雙軸審查報告 (`## Standards`, `## Spec`) | `implement`, `to-spec` |
-| **[`grilling`](#8-grilling)** | `/grilling`、`grill me` | 決策樹問答，窮盡未決前沿問題進行壓力測試 | 決策樹對齊、共識確認 | `domain-modeling`, `prototype`, `to-spec` |
-| **[`grill-me`](#9-grill-me)** | `/grill-me` | `/grilling` 的直接快捷別名 | 決策前沿問答 | `grilling` |
-| **[`grill-with-docs`](#10-grill-with-docs)** | `/grill-with-docs` | 進行審問的同時，同步建立 ADR 與詞彙表 | `CONTEXT.md`, `docs/adr/*.md` | `grilling`, `domain-modeling` |
-| **[`domain-modeling`](#11-domain-modeling)** | `/domain-modeling`、`領域建模` | 建立統一定義與架構決策紀錄（ADR） | `CONTEXT.md`, `docs/adr/000X-*.md` | `grill-with-docs`, `to-spec`, `tdd` |
-| **[`prototype`](#12-prototype)** | `/prototype`、`做個原型` | 快速建立拋棄式原型（邏輯 HTML / 多變體 UI） | 單檔 HTML、UI 路由、測試分支 | `domain-modeling`, `to-spec` |
-| **[`research`](#13-research)** | `/research`、`研究這個主題` | 背景 Sub-Agent 查閱第一手官方文件與原始碼 | `docs/research/*.md` (含引用來源) | `to-spec`, `fable-method` |
-| **[`fable-method`](#14-fable-method)** | `/fable-method [plan\|audit\|report]` | 嚴格 7 步驟問題解決循環（以證據為中心） | 結構化解答、驗證紀錄、Intent Line | `fable-loop`, `fable-judge`, `fable-domain` |
-| **[`fable-loop`](#15-fable-loop)** | `/fable-loop` | 4 階段全自動編排（探索/執行/對抗攻擊/稽核） | 階段執行 Checklist、對抗測試紀錄 | `fable-method`, `fable-judge` |
-| **[`fable-judge`](#16-fable-judge)** | `/fable-judge`、`/fable-judge suite` | 對抗性驗證：重新跑測試、比對 Diff 抓 6 大詐欺行為 | 判定報告 (`VERIFIED` / `REFUTED`) | `fable-method`, `fable-loop`, `fable-domain` |
-| **[`fable-domain`](#17-fable-domain)** | `/fable-domain <sector>` | 為非軟體工程領域建構信任適配器與 Trap Suite | Workflow 流程圖、Adapter、Trap 測資 | `fable-method`, `fable-judge` |
-| **[`handoff`](#18-handoff)** | `/handoff [hint]` | 壓縮目前對話脈絡為交接文件（存於系統暫存區） | 暫存交接 Markdown (含建議 Skills) | 接續新 Session |
+| **[`setup-matt-pocock-skills`](#1-setup-matt-pocock-skills)** | `/setup-matt-pocock-skills` | 初始化專案 Issue Tracker 與領域規範 | `docs/agents/*.md`, `AGENTS.md` | [Matt Pocock](#-matt-pocock-工程與審問技能體系) |
+| **[`to-spec`](#2-to-spec)** | `/to-spec` | 將對話脈絡轉化為完整規格與 User Stories | Spec, Issue (`ready-for-agent`) | [Matt Pocock](#-matt-pocock-工程與審問技能體系) |
+| **[`to-tickets`](#3-to-tickets)** | `/to-tickets` | 將規格拆為具備依賴關係的垂直切片工單 | `.scratch/**/issues/*.md` 或 Tracker Issues | [Matt Pocock](#-matt-pocock-工程與審問技能體系) |
+| **[`implement`](#4-implement)** | `/implement` | 依據 Ticket/Spec 實作功能並自動串接 TDD 與審查 | 原始碼、測試、Git Commit | [Matt Pocock](#-matt-pocock-工程與審問技能體系) |
+| **[`tdd`](#5-tdd)** | `/tdd`、`red-green-refactor` | 紅燈-綠燈-重構循環，鎖定公開 Seam 進行測試 | 規格化測試檔、`tests.md` | [Kent Beck / Feathers](#-經典軟體工程理論與著作依據) |
+| **[`codebase-design`](#6-codebase-design)** | `/codebase-design`、`deep module` | 提供深模組（Deep Modules）與 Seams 設計詞彙與準則 | 架構介面設計、`DEEPENING.md` | [John Ousterhout / Feathers](#-經典軟體工程理論與著作依據) |
+| **[`code-review`](#7-code-review)** | `/code-review`、`review since X` | 雙軸平行審查（程式碼規範 + 規格吻合度） | 雙軸審查報告 (`## Standards`, `## Spec`) | [Martin Fowler](#-經典軟體工程理論與著作依據) |
+| **[`grilling`](#8-grilling)** | `/grilling`、`grill me` | 決策樹問答，窮盡未決前沿問題進行壓力測試 | 決策樹對齊、共識確認 | [Matt Pocock](#-matt-pocock-工程與審問技能體系) |
+| **[`grill-me`](#9-grill-me)** | `/grill-me` | `/grilling` 的直接快捷別名 | 決策前沿問答 | [Matt Pocock](#-matt-pocock-工程與審問技能體系) |
+| **[`grill-with-docs`](#10-grill-with-docs)** | `/grill-with-docs` | 進行審問的同時，同步建立 ADR 與詞彙表 | `CONTEXT.md`, `docs/adr/*.md` | [Matt Pocock](#-matt-pocock-工程與審問技能體系) |
+| **[`domain-modeling`](#11-domain-modeling)** | `/domain-modeling`、`領域建模` | 建立統一定義與架構決策紀錄（ADR） | `CONTEXT.md`, `docs/adr/000X-*.md` | [Eric Evans (DDD)](#-經典軟體工程理論與著作依據) |
+| **[`prototype`](#12-prototype)** | `/prototype`、`做個原型` | 快速建立拋棄式原型（邏輯 HTML / 多變體 UI） | 單檔 HTML、UI 路由、測試分支 | [Matt Pocock](#-matt-pocock-工程與審問技能體系) |
+| **[`research`](#13-research)** | `/research`、`研究這個主題` | 背景 Sub-Agent 查閱第一手官方文件與原始碼 | `docs/research/*.md` (含引用來源) | [Matt Pocock](#-matt-pocock-工程與審問技能體系) |
+| **[`fable-method`](#14-fable-method)** | `/fable-method [plan\|audit\|report]` | 嚴格 7 步驟問題解決循環（以證據為中心） | 結構化解答、驗證紀錄、Intent Line | [Sahir619 (Fable)](#-fable-method-嚴謹問題解決與對抗審查體系) |
+| **[`fable-loop`](#15-fable-loop)** | `/fable-loop` | 4 階段全自動編排（探索/執行/對抗攻擊/稽核） | 階段執行 Checklist、對抗測試紀錄 | [Sahir619 (Fable)](#-fable-method-嚴謹問題解決與對抗審查體系) |
+| **[`fable-judge`](#16-fable-judge)** | `/fable-judge`、`/fable-judge suite` | 對抗性驗證：重新跑測試、比對 Diff 抓 6 大詐欺行為 | 判定報告 (`VERIFIED` / `REFUTED`) | [Sahir619 (Fable)](#-fable-method-嚴謹問題解決與對抗審查體系) |
+| **[`fable-domain`](#17-fable-domain)** | `/fable-domain <sector>` | 為非軟體工程領域建構信任適配器與 Trap Suite | Workflow 流程圖、Adapter、Trap 測資 | [Sahir619 (Fable)](#-fable-method-嚴謹問題解決與對抗審查體系) |
+| **[`handoff`](#18-handoff)** | `/handoff [hint]` | 壓縮目前對話脈絡為交接文件（存於系統暫存區） | 暫存交接 Markdown (含建議 Skills) | [Matt Pocock](#-matt-pocock-工程與審問技能體系) |
 
 ---
 
@@ -127,6 +127,7 @@ sequenceDiagram
 ---
 
 ### 1. `setup-matt-pocock-skills`
+> 📌 **來源**：[Matt Pocock 開源工程體系](#-matt-pocock-工程與審問技能體系)
 - **核心定位**：專案初始化配置。建立後續所有工程 Skills 所依賴的 Issue Tracker 設定、標籤詞彙表與領域文件路徑。
 - **觸發方式**：
   - `/setup-matt-pocock-skills`
@@ -139,6 +140,7 @@ sequenceDiagram
 ---
 
 ### 2. `to-spec`
+> 📌 **來源**：[Matt Pocock 開源工程體系](#-matt-pocock-工程與審問技能體系)
 - **核心定位**：需求合成器。不進行冗長訪談，直接將目前對話脈絡與程式庫現況轉化為標準規格文件，並發布至 Issue Tracker。
 - **觸發方式**：
   - `/to-spec`
@@ -153,6 +155,7 @@ sequenceDiagram
 ---
 
 ### 3. `to-tickets`
+> 📌 **來源**：[Matt Pocock 開源工程體系](#-matt-pocock-工程與審問技能體系)
 - **核心定位**：垂直切片工單拆解。將 Spec 或構想拆解為貫穿各層（UI/API/Schema/Test）的 **Tracer-Bullet Tickets**，並定義清楚的 Blocking Edges（依賴阻塞關係）。
 - **觸發方式**：
   - `/to-tickets`
@@ -165,6 +168,7 @@ sequenceDiagram
 ---
 
 ### 4. `implement`
+> 📌 **來源**：[Matt Pocock 開源工程體系](#-matt-pocock-工程與審問技能體系)
 - **核心定位**：工單實作推進器。依據 Spec 或 Ticket 具體落地程式碼，並在各階段強制執行品質守則。
 - **觸發方式**：
   - `/implement`
@@ -178,6 +182,7 @@ sequenceDiagram
 ---
 
 ### 5. `tdd`
+> 📌 **理論依據**：[Kent Beck (TDD)](#-經典軟體工程理論與著作依據) ｜ [Michael Feathers (Seams)](#-經典軟體工程理論與著作依據)
 - **核心定位**：測試驅動開發準則。規範 Red-Green-Refactor 循環，確保測試具有長久維護價值。
 - **觸發方式**：
   - `/tdd`、`red-green-refactor`、`TDD`
@@ -190,6 +195,7 @@ sequenceDiagram
 ---
 
 ### 6. `codebase-design`
+> 📌 **理論依據**：[John Ousterhout (Deep Modules)](#-經典軟體工程理論與著作依據) ｜ [Michael Feathers (Seams)](#-經典軟體工程理論與著作依據)
 - **核心定位**：深模組設計哲學（Deep Modules）。提供架構重構、介面設計與提高可測試性的共同語言。
 - **觸發方式**：
   - `/codebase-design`、提及 `deep module`、`seam`、`interface depth`
@@ -202,6 +208,7 @@ sequenceDiagram
 ---
 
 ### 7. `code-review`
+> 📌 **理論依據**：[Martin Fowler (12 Code Smells)](#-經典軟體工程理論與著作依據)
 - **核心定位**：雙軸獨立程式碼審查。平行啟動 2 個 Sub-Agent，分別從「規範」與「規格」兩個維度審視變更。
 - **觸發方式**：
   - `/code-review`、`review since <commit/branch>`、`審查程式碼`
@@ -235,6 +242,7 @@ flowchart TD
 ---
 
 ### 8. `grilling`
+> 📌 **來源**：[Matt Pocock 蘇格拉底式審問體系](#-matt-pocock-工程與審問技能體系)
 - **核心定位**：蘇格拉底式殘酷審問。將使用者的計畫映射為「決策樹（Design Tree）」，透過輪次（Rounds）不斷推進「決策前沿（Frontier）」，直到沒有隱含假設。
 - **觸發方式**：
   - `/grilling`、`grill me`、`壓力測試這個想法`
@@ -246,6 +254,7 @@ flowchart TD
 ---
 
 ### 9. `grill-me`
+> 📌 **來源**：[Matt Pocock 蘇格拉底式審問體系](#-matt-pocock-工程與審問技能體系)
 - **核心定位**：`/grilling` 的直覺觸發別名。
 - **觸發方式**：`/grill-me`
 - **連動關係**：直接執行 `/grilling` 流程。
@@ -253,6 +262,7 @@ flowchart TD
 ---
 
 ### 10. `grill-with-docs`
+> 📌 **來源**：[Matt Pocock 蘇格拉底式審問體系](#-matt-pocock-工程與審問技能體系)
 - **核心定位**：邊審問邊產出架構文件。在進行 `/grilling` 訪談的過程中，即時調用 `domain-modeling` 建立專案詞彙與 ADR。
 - **觸發方式**：`/grill-with-docs`
 - **連動關係**：結合 `grilling` 與 `domain-modeling`。
@@ -260,6 +270,7 @@ flowchart TD
 ---
 
 ### 11. `domain-modeling`
+> 📌 **理論依據**：[Eric Evans (Domain-Driven Design)](#-經典軟體工程理論與著作依據)
 - **核心定位**：領域建模與架構決策紀錄（ADR）。主動挑戰模糊詞彙，維護領域無所不在的語言（Ubiquitous Language）。
 - **觸發方式**：
   - `/domain-modeling`、`領域建模`、`記錄ADR`
@@ -270,6 +281,7 @@ flowchart TD
 ---
 
 ### 12. `prototype`
+> 📌 **來源**：[Matt Pocock 敏捷原型體系](#-matt-pocock-工程與審問技能體系)
 - **核心定位**：拋棄式原型開發。用最快速度寫出拋棄式程式碼來回答特定設計疑問。
 - **觸發方式**：
   - `/prototype`、`做個原型`、`驗證這個UI/邏輯`
@@ -281,6 +293,7 @@ flowchart TD
 ---
 
 ### 13. `research`
+> 📌 **來源**：[Matt Pocock 開源工程體系](#-matt-pocock-工程與審問技能體系)
 - **核心定位**：背景第一手資料研究員。
 - **觸發方式**：
   - `/research`、`研究這個主題`
@@ -319,6 +332,7 @@ flowchart TD
 ---
 
 ### 14. `fable-method`
+> 📌 **來源**：[Sahir619 / fable-method](#-fable-method-嚴謹問題解決與對抗審查體系)
 - **核心定位**：7 步驟閉環問題解決法。
 - **觸發方式**：
   - `/fable-method <task>`（完整執行）
@@ -337,6 +351,7 @@ flowchart TD
 ---
 
 ### 15. `fable-loop`
+> 📌 **來源**：[Sahir619 / fable-method](#-fable-method-嚴謹問題解決與對抗審查體系)
 - **核心定位**：Fable Method 的端到端多 Agent 編排器。
 - **觸發方式**：
   - `/fable-loop`
@@ -349,6 +364,7 @@ flowchart TD
 ---
 
 ### 16. `fable-judge`
+> 📌 **來源**：[Sahir619 / fable-method](#-fable-method-嚴謹問題解決與對抗審查體系)
 - **核心定位**：對抗性驗收裁判。將 Agent 的成果報告視為「待證明的宣稱（Claims）」，以 Diff 與實際終端執行結果為「地面真理（Ground Truth）」進行嚴格審判。
 - **觸發方式**：
   - `/fable-judge`（審查當前工作）
@@ -364,6 +380,7 @@ flowchart TD
 ---
 
 ### 17. `fable-domain`
+> 📌 **來源**：[Sahir619 / fable-method](#-fable-method-嚴謹問題解決與對抗審查體系)
 - **核心定位**：跨領域技能生成器。為非軟體開發領域（行銷、研究、數據分析、財務、營運等）生成客製化的 Fable 流程、適配器（Adapter）與 Trap Fixture。
 - **觸發方式**：
   - `/fable-domain <sector>`
@@ -378,6 +395,7 @@ flowchart TD
 ---
 
 ### 18. `handoff`
+> 📌 **來源**：[Matt Pocock 開源工程體系](#-matt-pocock-工程與審問技能體系)
 - **核心定位**：將當前會話提煉為結構化交接文件。
 - **觸發方式**：
   - `/handoff [hint]`、`交接工作`
@@ -396,6 +414,38 @@ flowchart TD
   - Antigravity 2.0、IDE、CLI (`agy`)、Python SDK、Slash Commands 與快捷鍵的全方位使用手冊與 Sitemap。
 - **`agy-customizations`** (`~/.gemini/antigravity/builtin/skills/agy-customizations`)：
   - 介紹 Antigravity 自訂系統架構（Skills、Rules、MCP Servers、Subagents、Workspaces）之載入優先順序與開發擴充指引。
+
+---
+
+## 📜 引用出處與方法論致謝 (Credits & Methodological Foundations)
+
+本技能庫之設計並非憑空捏造，而是深度奠基於當代軟體工程界的大師理論與 AI Agent 社群先驅之開源成果：
+
+### 🛠️ Matt Pocock 工程與審問技能體系
+- **核心貢獻者**：**Matt Pocock** ([@mattpocockuk](https://twitter.com/mattpocockuk) / [GitHub: mattpocock](https://github.com/mattpocock))
+- **涵蓋技能**：`setup-matt-pocock-skills`、`to-spec`、`to-tickets`、`implement`、`grilling`、`grill-me`、`grill-with-docs`、`prototype`、`research`、`handoff`。
+- **設計哲學**：專為 AI Pair-programming 打造的結構化交付流程（先 Seam 後 Spec、垂直切片 Tracer-Bullets、Expand-Contract 重構策略）。
+
+### 🛡️ Fable Method 嚴謹問題解決與對抗審查體系
+- **核心貢獻者**：**Sahir619 / Sahir** ([GitHub: Sahir619/fable-method](https://github.com/Sahir619/fable-method))
+- **涵蓋技能**：`fable-method`、`fable-loop`、`fable-judge`、`fable-domain`。
+- **設計哲學**：嚴格的 7 步驟證據閉環（Steps 0~6）、Intent Gate（修改意圖檢核）、Recall Gate（拒絕記憶猜測）、Twin Check（同類缺陷連帶排查）與多視角 Attacker 對抗性驗證。
+
+### 📚 經典軟體工程理論與著作依據
+本技能庫的多項核心機制直接源自下列經典軟體工程著作：
+
+1. **《A Philosophy of Software Design》** — *John Ousterhout*
+   - 奠定 [`codebase-design`](#6-codebase-design) 中 **深模組（Deep Modules vs. Shallow Modules）** 與 **介面槓桿率（Interface Leverage & Locality）** 的設計核心。
+2. **《Working Effectively with Legacy Code》** — *Michael Feathers*
+   - 奠定 [`tdd`](#5-tdd) 與 [`codebase-design`](#6-codebase-design) 中的 **縫隙測試準則（Seam Discipline）**：只在公開 Seam 寫測試，絕不侵入私有實作。
+3. **《Refactoring: Improving the Design of Existing Code》** — *Martin Fowler*
+   - 奠定 [`code-review`](#7-code-review) Standards 審查軸中的 **12 種經典壞味道基準（12 Code Smells Baseline）**（Feature Envy、Data Clumps、Primitive Obsession 等）。
+4. **《Domain-Driven Design: Tackling Complexity in the Heart of Software》** — *Eric Evans*
+   - 奠定 [`domain-modeling`](#11-domain-modeling) 中的 **無所不在語言（Ubiquitous Language）** 與 `CONTEXT.md` 限界上下文（Bounded Context）詞彙庫。
+5. **《Test-Driven Development: By Example》** — *Kent Beck*
+   - 奠定 [`tdd`](#5-tdd) 中的 **紅燈-綠燈-重構循環（Red-Green-Refactor Loop）** 與垂直切片貫穿原則。
+6. **Google DeepMind Antigravity Team**
+   - 奠定 Progressive Disclosure（漸進式技能揭露）、Rules 與 MCP 工具整合架構。
 
 ---
 
