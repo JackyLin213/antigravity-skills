@@ -70,6 +70,39 @@ flowchart TD
 
 ---
 
+## 🎯 使用情境決策指南 (Playbook & Decision Guide)
+
+不同生態系代表了不同的**協作情境與建議工作流**。您可以根據當前的開發需求選擇最合適的生態系：
+
+### 1. 情境速查表 (When to use which)
+
+| 您的當前情境 | 建議使用的生態系 | 建議指令與操作流程 | 預期效果 |
+| :--- | :--- | :--- | :--- |
+| **💡 1. 想法還很模糊 / 想評估架構方案**<br>（不知道邊界在哪、需要壓力測試） | **第二生態系**<br>(深度審問與領域建模) | 1. 執行 `/grill-with-docs`<br>2. 回答 Agent 的前沿決策問題<br>3. 若需驗證邏輯打 `/prototype` | 逼出所有盲點，並自動沉澱 `CONTEXT.md` 詞彙庫與架構決策（ADR）。 |
+| **⚙️ 2. 要開始把功能寫成程式碼落地**<br>（需求已清楚，需要乾淨規範地交付） | **第一生態系**<br>(Matt Pocock 規格與工程流) | 1. 打 `/to-spec` 產出規格<br>2. 打 `/to-tickets` 切出工單<br>3. 打 `/implement`（自動 TDD + Code Review） | 一氣呵成完成：規格 $\to$ 垂直切片 $\to$ 測試驅動實作 $\to$ 雙軸代碼審查。 |
+| **🛡️ 3. 抓奇怪的 Bug / 處理複雜跨模組任務**<br>（想防止 AI 偷偷改爛測試或假裝成功） | **第三生態系**<br>(Fable 嚴謹問題解決與對抗審查) | 1. 打 `/fable-loop <任務>`<br>2. 或完成後打 `/fable-judge` 審判 | 強制 Agent 以第一手證據說話；派出 Attacker 攻擊程式碼，抓出 6 大 AI 詐欺。 |
+| **🔄 4. 對話太長 / Token 快滿需要換新對話** | **第四生態系**<br>(脈絡傳遞與交接) | 打 `/handoff` | 產出結構化交接 Markdown，新 Session 直接接棒繼續。 |
+
+---
+
+### 2. 🚀 端到端最佳實踐組合拳 (End-to-End Pipeline)
+
+當您要開發一個**重要的中大型功能**時，推薦將這三套生態系串連起來使用：
+
+```mermaid
+flowchart LR
+    Step1["1. 概念審問<br/>(/grill-with-docs)"] --> Step2["2. 規格與工單<br/>(/to-spec ➔ /to-tickets)"]
+    Step2 --> Step3["3. TDD 實作<br/>(/implement)"]
+    Step3 --> Step4["4. 嚴格驗收<br/>(/code-review + /fable-judge)"]
+```
+
+1. **第一階段（構想）**：用 `/grill-with-docs` 釐清所有名詞與設計決策，建立專案的 `CONTEXT.md` 與 ADR。
+2. **第二階段（規劃）**：用 `/to-spec` 把剛剛討論好的共識轉為完整規格，再用 `/to-tickets` 切成一張張好實作的工單。
+3. **第三階段（實作）**：針對每張工單執行 `/implement`，Agent 會自動運用 `/tdd` 於公開縫隙（Seams）進行測試並實作。
+4. **第四階段（驗收）**：實作完成後，除了 `/code-review` 檢查規範，還可以用 `/fable-judge` 重新跑測試與比對 Git Diff，確保沒有任何遺漏或作弊！
+
+---
+
 ## 📊 技能快速索引表 (Quick Reference Matrix)
 
 | 技能名稱 | 觸發方式 / 指令 | 核心功能 | 關鍵產出物 (Artifacts) | 主要連動技能 |
@@ -359,7 +392,7 @@ flowchart TD
   3. **Scope creep**：未經許可偷改無關程式碼或增加依賴。
   4. **Unauthorized action**：未獲使用者明確指令即執行 Push/Deploy 等外向操作。
   5. **Spec betrayal**：為了迎合錯誤的測試而破壞 README 或型別定義。
-  6. **Debris**：遺留 debug 檔案、print 輸出或註解雜物。
+  6. **Debris**：遺留 debug檔案、print 輸出或註解雜物。
 
 ---
 
