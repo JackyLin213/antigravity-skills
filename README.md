@@ -1,14 +1,14 @@
 # Antigravity & AI Agent Skills 全景指南
 
-本儲存庫收錄了專為 AI 協作開發、需求規劃、架構設計、品質驗證與任務編排設計的 **18 隻通用專業技能（Skills）**。
+本儲存庫收錄了專為 AI 協作開發、需求規劃、架構設計、品質驗證、任務編排與經驗閉環設計的 **19 隻通用專業技能（Skills）**。
 
-透過這些 Skills，Agent 能夠在不同開發階段扮演「領域架構師」、「對抗性審查員」、「嚴格 TDD 工程師」或「需求拆解專家」，並藉由明確定義的流程與工件（Artifacts）達成無縫連動。
+透過這些 Skills，Agent 能夠在不同開發階段扮演「領域架構師」、「對抗性審查員」、「嚴格 TDD 工程師」、「需求拆解專家」或「經驗閉環自主演化引擎」，並藉由明確定義的流程與工件（Artifacts）達成無縫連動。
 
 ---
 
 ## 🗺️ 全域架構流程圖 (Master Workflow Diagram)
 
-下圖展示 4 大生態系如何相互銜接，從最初的想法審問、規格制定，到工程實作、對抗驗證與任務交接：
+下圖展示 5 大生態系如何相互銜接，從最初的想法審問、規格制定，到工程實作、對抗驗證、自主演化與任務交接：
 
 ```mermaid
 flowchart TD
@@ -37,6 +37,10 @@ flowchart TD
         FDOMAIN["fable-domain<br/>(跨領域適配器與 Trap 生成)"]
     end
 
+    subgraph Evolution ["🧠 5. 自主演化與經驗閉環 (Self-Evolution & Reflexion)"]
+        ALE["agent-loop-engineering (/ale)<br/>(Friction Trap ➔ 5D Causal Chain ➔ LL_GATE ➔ Promotion)"]
+    end
+
     subgraph Continuity ["🔄 4. 脈絡傳遞與工作交接 (Handoff)"]
         HO["handoff<br/>(產出交接 Markdown)"]
     end
@@ -54,6 +58,7 @@ flowchart TD
 
     SPEC --> TICKETS
     TICKETS --> IMPL
+    TICKETS -.->|自主防呆交付| ALE
     IMPL --> TDD
     DESIGN -.->|架構設計原則| TDD
     DESIGN -.->|架構設計原則| IMPL
@@ -65,7 +70,12 @@ flowchart TD
     FLOOP --> FJUDGE
     FDOMAIN -.->|擴充非程式領域| FMETHOD
 
+    REVIEW -.->|違規轉化為阻力| ALE
+    FJUDGE -.->|駁回轉化為阻力| ALE
+    ALE -.->|提煉持久化知識| SETUP
+
     IMPL -.->|切換對話/中斷交接| HO
+    ALE -.->|帶有避坑清單交接| HO
 ```
 
 ---
@@ -81,7 +91,8 @@ flowchart TD
 | **💡 1. 想法還很模糊 / 想評估架構方案**<br>（不知道邊界在哪、需要壓力測試） | **第二生態系**<br>(深度審問與領域建模) | 1. 執行 `/grill-with-docs`<br>2. 回答 Agent 的前沿決策問題<br>3. 若需驗證邏輯打 `/prototype` | 逼出所有盲點，並自動沉澱 `CONTEXT.md` 詞彙庫與架構決策（ADR）。 |
 | **⚙️ 2. 要開始把功能寫成程式碼落地**<br>（需求已清楚，需要乾淨規範地交付） | **第一生態系**<br>(Matt Pocock 規格與工程流) | 1. 打 `/to-spec` 產出規格<br>2. 打 `/to-tickets` 切出工單<br>3. 打 `/implement`（自動 TDD + Code Review） | 一氣呵成完成：規格 $\to$ 垂直切片 $\to$ 測試驅動實作 $\to$ 雙軸代碼審查。 |
 | **🛡️ 3. 抓奇怪的 Bug / 處理複雜跨模組任務**<br>（想防止 AI 偷偷改爛測試或假裝成功） | **第三生態系**<br>(Fable 嚴謹問題解決與對抗審查) | 1. 打 `/fable-loop <任務>`<br>2. 或完成後打 `/fable-judge` 審判 | 強制 Agent 以第一手證據說話；派出 Attacker 攻擊程式碼，抓出 6 大 AI 詐欺。 |
-| **🔄 4. 對話太長 / Token 快滿需要換新對話** | **第四生態系**<br>(脈絡傳遞與交接) | 打 `/handoff` | 產出結構化交接 Markdown，新 Session 直接接棒繼續。 |
+| **🧠 4. 執行中大型任務 / 想防止 AI 一錯再錯**<br>（自動提煉踩坑教訓、建立專案長期免疫力） | **第五生態系**<br>(自主演化與經驗閉環) | 執行 `/ale <任務名稱>` | 自動攔截盲目重試，提煉 5 維因果鏈 LL，產出前強制 `LL_GATE` 自檢，任務完成自動晉升專案永久規則。 |
+| **🔄 5. 對話太長 / Token 快滿需要換新對話** | **第四生態系**<br>(脈絡傳遞與交接) | 打 `/handoff` | 產出結構化交接 Markdown，新 Session 直接接棒繼續。 |
 
 ---
 
@@ -125,6 +136,7 @@ flowchart LR
 | **[`fable-judge`](#16-fable-judge)** | `/fable-judge`、`/fable-judge suite` | 對抗性驗證：重新跑測試、比對 Diff 抓 6 大詐欺行為 | 判定報告 (`VERIFIED` / `REFUTED`) | `fable-method`, `fable-loop`, `fable-domain` |
 | **[`fable-domain`](#17-fable-domain)** | `/fable-domain <sector>` | 為非軟體工程領域建構信任適配器與 Trap Suite | Workflow 流程圖、Adapter、Trap 測資 | `fable-method`, `fable-judge` |
 | **[`handoff`](#18-handoff)** | `/handoff [hint]` | 壓縮目前對話脈絡為交接文件（存於系統暫存區） | 暫存交接 Markdown (含建議 Skills) | 接續新 Session |
+| **[`agent-loop-engineering`](#19-agent-loop-engineering)** | `/ale <task>` | 自主閉環執行引擎，遇到阻力自動提煉 5D 因果鏈 LL，產出前強制 `LL_GATE` 自檢，完成後自動晉升為專案永久守則 | `docs/LESSONS_LEARNED.md`, `.scratch/SESSION_LL.md` | `implement`, `fable-loop`, `fable-judge` |
 
 ---
 
@@ -421,9 +433,29 @@ flowchart TD
 
 ---
 
+## 🧠 第五生態系：自主演化與經驗閉環 (Self-Evolution & Reflexion Loop)
+
+當您要執行中大型編程任務，並希望 Agent 在遭遇錯誤或對抗審查時，不再「盲目局部微調」，而是將失敗轉化為結構化的教訓（Lessons Learned）時使用。
+
+---
+
+### 19. `agent-loop-engineering`
+- **核心定位**：全自動經驗閉環與總指揮流水線（Meta-Orchestrator Pipeline）。落實「Agent 會遺忘，但代碼庫不會（The agent forgets, the repo doesn't）」哲學，主動調度並串聯 `/research`、`/tdd`、`/implement`、`/fable-judge`、`/code-review` 與 `/handoff`。
+- **觸發方式**：
+  - `/ale <任務描述>`
+- **五大運作階段與技能調度矩陣**：
+  1. **Phase 1: Ingestion & Pre-flight Gate**：自動讀取 `docs/LESSONS_LEARNED.md`；若缺少一手資料自動派發 **`/research`** Sub-Agent，強制宣告 `LL_GATE`。
+  2. **Phase 2: Execution Delegation**：程式碼任務自動調用 **`/tdd`**（紅綠重構）或 **`/implement`**；非程式碼任務由主線進行外科手術生成。
+  3. **Phase 3: Friction Adapter & 5D Distillation**：攔截 TDD 重試失敗、報錯或審查駁回，立即中斷，提煉五維因果鏈（Trigger、False Assumption、Root Cause、Invariant、Verification Check）寫入 `SESSION_LL.md`（上限 3 次嚴格熔斷）。
+  4. **Phase 4: Multi-Lens Adversarial Verification**：平行派出 **`/fable-judge`**（抓弱化測試與 6 大詐欺）與 **`/code-review`**（雙軸規範審查）Sub-Agents 對抗攻擊。
+  5. **Phase 5: Promotion Review, Compaction & Handoff**：通過三原則過濾者自動晉升為專案永久 LL（全域超 20 條自動壓實）；Context 過長時自動調用 **`/handoff`**。
+- **關鍵產出物**：`docs/LESSONS_LEARNED.md`、`.scratch/SESSION_LL.md`。
+
+---
+
 ## 🧩 附錄：系統內建技能 (Built-in Skills)
 
-除了本目錄的 18 隻通用技能外，Antigravity 系統內建以下 2 隻全域導覽技能：
+除了本目錄的 19 隻通用技能外，Antigravity 系統內建以下 2 隻全域導覽技能：
 
 - **`antigravity-guide`** (`~/.gemini/antigravity/builtin/skills/antigravity_guide`)：
   - Antigravity 2.0、IDE、CLI (`agy`)、Python SDK、Slash Commands 與快捷鍵的全方位使用手冊與 Sitemap。
@@ -446,6 +478,12 @@ flowchart TD
 - **涵蓋技能**：`fable-method`、`fable-loop`、`fable-judge`、`fable-domain`。
 - **設計哲學**：嚴格的 7 步驟證據閉環（Steps 0~6）、Intent Gate（修改意圖檢核）、Recall Gate（拒絕記憶猜測）、Twin Check（同類缺陷連帶排查）與多視角 Attacker 對抗性驗證。
 
+### 🧠 Agent Loop Engineering (ALE) 迴圈工程與自省記憶體系
+- **核心貢獻者 / 理論依據**：
+  - **Noah Shinn et al.** (*Reflexion: Language Agents with Verbal Reinforcement Learning*, NeurIPS 2023) 奠定 Evaluator ➔ Self-Reflection ➔ Invariant Memory 核心。
+  - **Awesome Loop Engineering Community** 奠定「The agent forgets, the repo doesn't」持久化狀態治理與阻力捕獲機制。
+- **涵蓋技能**：`agent-loop-engineering` (`/ale`)。
+
 ### 📚 經典軟體工程理論與著作依據
 本技能庫的多項核心機制直接源自下列經典軟體工程著作：
 
@@ -467,5 +505,6 @@ flowchart TD
 > 💡 **小撇步**：在開發複雜功能時，推薦的工作流組合：
 > 1. 先用 `/grill-with-docs` 釐清架構並沉澱 `CONTEXT.md` 與 ADR。
 > 2. 用 `/to-spec` 產生功能規格，再用 `/to-tickets` 切出 Tracer-bullet 工單。
-> 3. 針對每張工單執行 `/implement`（內建 `/tdd`）。
+> 3. 針對每張工單執行 `/ale`（或 `/implement`），享受自主防呆與自省記憶保護。
 > 4. 驗收時使用 `/code-review` 與 `/fable-judge` 確保品質零瑕疵！
+
