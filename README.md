@@ -1,6 +1,6 @@
 # Antigravity & AI Agent Skills 全景指南
 
-本儲存庫收錄了專為 AI 協作開發、需求規劃、架構設計、品質驗證、任務編排、自省演化與人機協同設計的 **31 隻通用專業技能（Skills）**。
+本儲存庫收錄了專為 AI 協作開發、需求規劃、架構設計、品質驗證、任務編排、自省演化與人機協同設計的 **32 隻通用專業技能（Skills）**。
 
 透過這些 Skills，Agent 能夠在不同開發階段扮演「領域架構師」、「對抗性審查員」、「嚴格 TDD 工程師」、「巨型專案導航者」、「經驗閉環自主演化引擎」或「人機協作嚮導」，並藉由明確定義的流程與工件（Artifacts）達成無縫連動。
 
@@ -14,6 +14,7 @@
 flowchart TD
     subgraph MetaNav ["🧭 6. 導航、教學與元輔助 (Collaboration & Meta)"]
         ASK["ask-matt / find-skills<br/>(技能智慧推薦與發現)"]
+        CREATOR["skill-creator<br/>(技能創建、調優與 Eval 評測)"]
         TEACH["teach<br/>(專案概念與技術教學)"]
         WAIT["wait-what<br/>(溝通急停重述)"]
         WIZARD["wizard<br/>(引導人類操作的 Bash 向導)"]
@@ -113,7 +114,7 @@ flowchart TD
 
 ## 🎯 使用情境決策指南 (Playbook & Decision Guide)
 
-本倉庫的 31 隻技能覆蓋軟體開發生命週期的每一處痛點。您可以根據當前的實際開發情境快速選擇：
+本倉庫的 32 隻技能覆蓋軟體開發生命週期的每一處痛點。您可以根據當前的實際開發情境快速選擇：
 
 ### 1. 痛點情境速查表 (When to use which)
 
@@ -131,6 +132,7 @@ flowchart TD
 | **✋ 9. AI 回答太抽象或不知所云** | **第六生態系**<br>(溝通輔助) | 輸入 `/wait-what` | 強制中斷 Agent 當前思路，要求換個方式白話重新表達。 |
 | **🎓 10. 想學習專案概念或帶新人入門** | **第六生態系**<br>(知識教學) | 執行 `/teach <概念名稱>` | Agent 化身頂級導師，以該專案的實例進行教學。 |
 | **🔄 11. 對話太長 / Token 快滿需要換新對話** | **第六生態系**<br>(脈絡傳遞與交接) | 執行 `/handoff` | 產出結構化交接 Markdown，新 Session 直接接棒繼續。 |
+| **🛠️ 12. 想從無到有建立/改善技能並做 Eval 評測** | **第六生態系**<br>(技能研發與評測) | 執行 `skill-creator` | 自動生成完整標準技能結構、撰寫測試集並執行基準評測與變異分析。 |
 
 ---
 
@@ -152,7 +154,7 @@ flowchart LR
 
 ---
 
-## 📊 31 隻技能快速索引總表 (Quick Reference Matrix)
+## 📊 32 隻技能快速索引總表 (Quick Reference Matrix)
 
 | 技能名稱 | 觸發方式 / 指令 | 核心定位 | 關鍵產出物 (Artifacts) | 主要連動技能 |
 | :--- | :--- | :--- | :--- | :--- |
@@ -177,6 +179,7 @@ flowchart LR
 | **[`research`](#13-research)** | `/research`、`研究這個主題` | 背景 Sub-Agent 查閱第一手官方文件與原始碼 | `docs/research/*.md` (含引用來源) | `to-spec`, `fable-method`, `ale` |
 | **[`resolving-merge-conflicts`](#24-resolving-merge-conflicts)** | `/resolving-merge-conflicts` | 手術式解決 Git Merge/Rebase 衝突，精確保留語意 | 乾淨合併的檔案、解決日誌 | `implement`, `tdd` |
 | **[`setup-matt-pocock-skills`](#1-setup-matt-pocock-skills)** | `/setup-matt-pocock-skills` | 初始化專案 Issue Tracker 與領域規範 | `docs/agents/*.md`, `AGENTS.md` | `to-spec`, `to-tickets`, `code-review` |
+| **[`skill-creator`](#31-skill-creator)** | `skill-creator`、`create skill` | 從無到有創建、修改與改善技能，執行 Eval 與觸發詞基準測試 | 完整技能目錄、Eval 測試集、評測報告 | `writing-for-agents`, `find-skills` |
 | **[`tdd`](#5-tdd)** | `/tdd`、`red-green-refactor` | 紅燈-綠燈-重構循環，鎖定公開 Seam 進行測試 | 規格化測試檔、`tests.md` | `codebase-design`, `implement`, `ale` |
 | **[`teach`](#25-teach)** | `/teach <topic>` | 在當前工作區脈絡下，以專案實例教學新概念 | 教學對話、示範代碼 | `domain-modeling` |
 | **[`to-questionnaire`](#26-to-questionnaire)** | `/to-questionnaire` | 將無法獨自裁決的決策轉化為結構化問卷供他人填寫 | 決策問卷 Markdown | `grilling`, `wayfinder` |
@@ -362,11 +365,15 @@ flowchart LR
 - **核心定位**：跨會話結構化交接器。將當前對話狀態打包存於暫存區，平滑過渡至新 Session。
 - **觸發方式**：`/handoff`。
 
+#### 31. `skill-creator`
+- **核心定位**：全功能技能開發與評測引擎。從無到有建立全新技能、編輯並改善既有技能，撰寫測試案例集（Evals）、執行基準評測與變異分析，並透過最佳化流程微調描述句提升技能觸發精準度。
+- **觸發方式**：`skill-creator`、`create skill`、`optimize skill`。
+
 ---
 
 ## 🧩 附錄：系統內建技能 (Built-in Skills)
 
-除了本目錄的 31 隻通用技能外，Antigravity 系統內建以下 2 隻全域導覽技能：
+除了本目錄的 32 隻通用技能外，Antigravity 系統內建以下 2 隻全域導覽技能：
 
 - **`antigravity-guide`** (`~/.gemini/antigravity/builtin/skills/antigravity_guide`)：
   - Antigravity 2.0、IDE、CLI (`agy`)、Python SDK、Slash Commands 與快捷鍵的全方位使用手冊與 Sitemap。
