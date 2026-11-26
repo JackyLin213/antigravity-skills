@@ -1,0 +1,24 @@
+{
+  "ale-pretool-gate": {
+    "enabled": true,
+    "PreToolUse": [
+      {
+        "matcher": "edit_file|write_file|run_command",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ./scripts/pretool_gate.py --event PreToolUse",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "type": "command",
+        "command": "python3 ./scripts/pretool_gate.py --event Stop",
+        "timeout": 10
+      }
+    ]
+  }
+}

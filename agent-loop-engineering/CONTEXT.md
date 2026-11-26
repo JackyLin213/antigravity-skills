@@ -1,82 +1,73 @@
-# Agent Loop Engineering (ALE)
+# Antigravity Agent Harness & Skills Ecosystem
 
-A system that enables AI agents to autonomously extract structured Lessons Learned (LL) from execution friction, and enforce pre-flight constraints to prevent repeating mistakes.
+Defines the core domain vocabulary for orchestrating autonomous agent loops, always-on rules, and cross-model verification across the skill suite.
 
 ## Language
 
-### Core Concepts
+**Harness**:
+The deterministic control layer surrounding an LLM session—comprising lifecycle hooks, externalized state ledgers, executable checks, and model dispatchers—that enforces behavioral boundaries outside the model's own prompt compliance.
+_Avoid_: Wrapper, prompt template, workflow
 
-**Lessons Learned (LL)**:
-A structured invariant distilled from a failure or surprise, specifying the trigger, anti-pattern, root cause, and enforceable rule.
-_Avoid_: Error log, post-mortem, notes, scratchpad
+**Always-On Rule**:
+A concise, permanently loaded constraint (living in `~/.gemini/config/plugins/ale-harness/rules/AGENTS.md`) that governs every conversational turn, including daily Q&A and ad-hoc edits.
+_Avoid_: System prompt, global skill, passive doc
 
-**Session LL**:
-A temporary, task-scoped lesson recorded during the current execution loop to prevent immediate repetitive blunders.
-_Avoid_: Working memory, temp notes, cache
+**On-Demand Skill**:
+A multi-phase procedural runbook (`SKILL.md`) loaded via progressive disclosure when triggered by a slash command or matching task intent.
+_Avoid_: Rule, plugin, macro
 
-**Project LL**:
-A permanent, verified lesson promoted from Session LL that applies across all future sessions in the repository.
-_Avoid_: Rules, guidelines, best practices
+**Ledger**:
+The externalized per-workspace state file (`$HOME/tmp/ale_harness/<workspace_slug>/ledger.json`, overridable via `ALE_OUTPUT_ROOT`) that records `Tier · Type`, `plan.md` SHA-256, `RED Gate`, `LL_GATE`, `Friction Count`, `DONE` verification, and `Ship Gate` rulings without polluting the target Git repository.
+_Avoid_: Scratch file, session log, temp state
 
-### Loop Mechanisms
+**Counterpart Model**:
+A frontier LLM from a different model family than the active session model, dispatched for cross-family adversarial review or Cycle-2 Strike-Breaking to break correlated blind spots.
+_Avoid_: Subagent model, fallback model, backup LLM
 
-**Friction**:
-Any deterministic failure, test break, tool error, or verification rejection that halts blind retry.
-_Avoid_: Bug, mistake, crash
+**Worker Role**:
+A non-authoring execution role dispatched by the Harness or multi-agent orchestrator, including fast discovery (`research`), fast mechanical editing (`fast-exec`), subagents (`invoke_subagent`), and `/swarm` workers, whose target model is resolved dynamically from the live host model catalog.
+_Avoid_: Hardcoded helper, fixed subagent, generic worker
 
-**Friction Hook**:
-The mandatory execution pause triggered by friction that forces root-cause distillation before code modification.
-_Avoid_: Error handler, retry logic, catch block
+**Dynamic Model Registry**:
+Live discovery and capability ranking of servable host models via `agy models` combined with an optional user override file (`$HOME/tmp/ale_harness/model_routing.json`), keeping both Worker Roles and Counterpart Models current as new model generations appear.
+_Avoid_: Static model table, hardcoded 22-model map
 
-**Pre-flight Gate**:
-The mandatory self-check phase prior to generating code or plans, cross-referencing active LL invariants.
-_Avoid_: Verification, sanity check, review
+**Review Packet**:
+The full, uncapped markdown context file (`<session_dir>/review_packet.md`) containing git diffs, untracked files, baseline dirty-tree separation, test outputs, and active invariants that a read-only reviewer can inspect on demand when inline CLI prompts exceed safe argv limits.
+_Avoid_: Truncated inline diff, manual extra prompt workaround
 
-**LL_GATE**:
-The explicit, required syntax declaration emitted in thought or output stating which LL invariants are being honored before invoking write tools.
-_Avoid_: Disclaimer, safety note, check-in
+**Strike-Breaker**:
+The automated handoff of a stalled task (at Friction Cycle 2) to a Counterpart Model with the accumulated diff, failure output, and session invariants to escape the primary model's reasoning rut.
+_Avoid_: Retry, fallback, escalation
 
-**Distillation**:
-The analytical transformation of an observed friction event into a structured, transferable LL invariant.
-_Avoid_: Summary, logging, post-mortem writeup
+**RED Gate**:
+The mandatory pre-edit proof recorded in the Ledger confirming a runtime test or reproduction command fails on the target behavior (distinguishing test assertion failure from build/syntax failure) prior to modifying production code.
+_Avoid_: Failing build, syntax error, manual check
 
-**Promotion**:
-The selective graduation of a verified Session LL into a permanent Project LL upon task completion.
-_Avoid_: Saving, persisting, exporting
+**Executable Invariant (`LL_GATE`)**:
+A positive domain or architectural rule in `LESSONS_LEARNED.md` paired with a deterministic shell or regex check (`Verification Check`) that the Harness executes before and after code changes.
+_Avoid_: Guideline, best practice, tip
 
-**Three-Test Filter**:
-The gating criteria (Generalizability, Tool Gap, Permanence) required for a Session LL to qualify for Promotion.
-_Avoid_: Heuristics, screening, checklist
+**Ship Gate**:
+The hard-stop boundary enforced by `PreToolUse` hooks before any outward-facing or irreversible action (`git push`, `gh pr create`, tag/release) requiring explicit user confirmation recorded via `ruling --allow-ship`.
+_Avoid_: Commit hook, CI check
 
-**Friction Budget**:
-The maximum allowance of 3 consecutive friction-distillation-retry iterations before mandatory execution abort.
-_Avoid_: Retry limit, max attempts, timeout
+**Shortcut Ledger**:
+An explicit inline code marker (`# ponytail: <reason>` or `# shortcut: <ceiling>, <upgrade trigger>`) that records a deliberate YAGNI simplification and the exact condition under which it must be upgraded.
+_Avoid_: TODO, FIXME, hack
 
-**Compaction**:
-The consolidation and deduplication of Project LLs once the repository exceeds the 20-rule ceiling.
-_Avoid_: Pruning, cleanup, archiving
+**Hybrid Humanizer Tiering**:
+The two-tier prose governance model that embeds core anti-AI-slop structural rules as an Always-On Rule for zero-latency daily conversation while dynamically loading the full `humanizer-zh-tw` (zh-TW) or `humanizer` (English) On-Demand Skill in silent Embedded Mode whenever authoring or editing documents and long-form prose.
+_Avoid_: Full-skill every turn, raw chatbot prose, telegraphic bullet spam
 
-**Submodule LL**:
-A localized set of invariants scoped to a specific package or domain directory rather than the repository root.
-_Avoid_: Local rules, component config
+**Tiered Counterpart Routing**:
+The quota-aware cross-family model pairing policy that dispatches high-efficiency frontier counterparts (`claude-sonnet-5-5-high` <-> `gemini-4-argon-high`) for Tier 2 standard reviews while reserving flagship deep-reasoning counterparts (`claude-opus-5-5-high` <-> `gemini-4-carbon-high`) for Tier 3 architectural reviews, Cycle-2 Strike-Breaking, and flagship-authored changes, backed by a cross-family fallback chain.
+_Avoid_: Flat Opus routing, same-family review, static model table
 
-### Orchestration & Federation
+**Async Dispatch Lease**:
+A time-bounded process record (`dispatch_in_progress`) written to the Ledger while `model_router.py` executes a cross-model CLI call, allowing the `Stop` hook to yield the turn cleanly so the parent session can await background task completion without `sleep` polling.
+_Avoid_: Sleep polling loop, duplicate background dispatch, manual stop override
 
-**Meta-Orchestrator**:
-The supervisory role assumed by ALE that coordinates specialized skills across a 5-phase closed loop pipeline.
-_Avoid_: Manager, master script, task runner
-
-**Subagent Federation**:
-The architectural pattern where heavy research and adversarial verifications fan out to isolated parallel subagents.
-_Avoid_: Multi-agent swarm, background tasks
-
-**Friction Adapter**:
-The protocol that maps tool errors, test red-loops, and adversarial review rejections directly into standard Friction events.
-_Avoid_: Error mapper, handler
-
-**Dual-Track Routing**:
-The automatic dispatch mechanism that selects either the Code Track (TDD + Review) or Non-Code Track (Research + Domain Judge).
-_Avoid_: Branching logic, mode switch
-
-
-
+**Superseded Invariant**:
+A historical rule in `LESSONS_LEARNED.md` marked `Status: Superseded by <ID>` via `retire-ll` when an architectural transition replaces its behavior, preserving audit provenance while instructing `red_gate.py` to skip its obsolete verification check.
+_Avoid_: Zombie invariant, deleted lesson, unguarded dead code

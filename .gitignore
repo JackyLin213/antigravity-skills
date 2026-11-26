@@ -2,3 +2,7 @@
 synology-nas/
 obsidian-note/
 .obsidian/
+
+# Python bytecode
+__pycache__/
+*.pyc

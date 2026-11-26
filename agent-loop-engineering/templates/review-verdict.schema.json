@@ -1,0 +1,46 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ALEReviewVerdict",
+  "type": "object",
+  "required": ["verdict", "summary", "findings"],
+  "properties": {
+    "verdict": {
+      "type": "string",
+      "enum": ["VERIFIED", "VERIFIED_WITH_CAVEATS", "REFUTED"]
+    },
+    "summary": {
+      "type": "string",
+      "description": "Concise outcome-first summary of the cross-family review."
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["axis", "severity", "file_or_surface", "issue", "smallest_fix"],
+        "properties": {
+          "axis": {
+            "type": "string",
+            "enum": ["fable-judge", "ponytail-review", "code-review", "session-invariant"]
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["must-fix", "should-fix", "nice-to-have"]
+          },
+          "file_or_surface": {
+            "type": "string"
+          },
+          "issue": {
+            "type": "string"
+          },
+          "smallest_fix": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "suggested_invariant": {
+      "type": ["string", "null"],
+      "description": "Optional 5D invariant suggestion if verdict is REFUTED."
+    }
+  }
+}

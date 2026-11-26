@@ -1,0 +1,277 @@
+{
+  "skill_name": "agent-loop-engineering",
+  "capabilities": [
+    {
+      "id": "CAP-01",
+      "name": "External Ledger Init, Baseline Dirty Snapshot & Tiered Pairing",
+      "description": "Initialize ledger.json, baseline.patch (if dirty), and SESSION_LL.md outside the Git tree (with ALE_OUTPUT_ROOT override) and dynamically pair Gemini <-> Claude counterparts."
+    },
+    {
+      "id": "CAP-02",
+      "name": "PreToolUse Edit/Command Gate & Subprocess Role Isolation",
+      "description": "Deny edit_file/write_file before RED/LL gates, deny edit/write/run_command on read-only review subprocesses while permitting read_file, and allow strike-breaker edits."
+    },
+    {
+      "id": "CAP-03",
+      "name": "Runtime RED Gate Classification & Exemption",
+      "description": "Accept runtime test assertion failures, reject exit-0 or SyntaxError crashes, and support explicit refactor/docs exemption."
+    },
+    {
+      "id": "CAP-04",
+      "name": "Executable LESSONS_LEARNED Scoped Regex & Retirement Runner",
+      "description": "Parse and execute 'cmd:', 'regex-forbid: [path ::] pattern', and 'regex-require:' checks while skipping 'Superseded', 'Dismissed', and 'Promoted' invariants."
+    },
+    {
+      "id": "CAP-05",
+      "name": "Friction Cycle 1 & Cycle 2 Cross-Family Strike-Breaker Clean-Guard",
+      "description": "Distill 5D Causal Chain into SESSION_LL.md, reset ll_gate_passed, trigger CYCLE_2_STRIKE_BREAKER with the latest flagship Counterpart Model, and halt fallback if partial edits dirtied the workspace."
+    },
+    {
+      "id": "CAP-06",
+      "name": "Friction Cycle 3 Hard Lock & Honest Handback",
+      "description": "Lock ledger edits at Friction Count 3 (ABORT_HANDBACK) so PreToolUse denies any further code modifications."
+    },
+    {
+      "id": "CAP-07",
+      "name": "Observed DONE, Full Review Packet, Must-Fix Caveat Gate & Stop Lease",
+      "description": "Write uncapped review_packet.md, reject VERIFIED_WITH_CAVEATS containing must-fix findings, yield Stop hook during active dispatch_in_progress leases, and transition to verified after done + review pass."
+    },
+    {
+      "id": "CAP-08",
+      "name": "SLL Completion Hygiene (Promote, Dismiss & Retire)",
+      "description": "Block ruling --complete while active SLL entries remain unresolved, promote qualifying entries to knowledgebase LESSONS_LEARNED.md, dismiss session-only entries via dismiss-ll, and retire superseded rules via retire-ll."
+    },
+    {
+      "id": "CAP-09",
+      "name": "Outward Ship Gate & Plan SHA-256 Binding",
+      "description": "Block outward 'git push' / 'gh pr create' on active and verified ledgers until ruling --allow_ship is recorded, and bind approved plan.md SHA-256."
+    },
+    {
+      "id": "CAP-10",
+      "name": "Marketplace Portability Scanner",
+      "description": "Detect hardcoded personal home directories or usernames in skill and plugin files before delivery."
+    },
+    {
+      "id": "CAP-11",
+      "name": "Dynamic Live Model Discovery, Routing Overrides & Error-Envelope Fallback",
+      "description": "Discover live models from agy models (automatically adopting Neon and future generations), apply model_routing.json overrides, and advance the fallback chain when agy returns exit-0 JSON error envelopes."
+    }
+  ],
+  "evals": [
+    {
+      "id": 1,
+      "name": "pre-flight-red-and-edit-gate",
+      "prompt": "Fix the off-by-one discount calculation bug using test-first pre-flight gates and external ledger tracking.",
+      "covers": ["CAP-01", "CAP-02", "CAP-03"],
+      "expectations": [
+        "External ledger.json, baseline.patch (for pre-existing dirty files), and SESSION_LL.md are created under the overridden output root without polluting git status.",
+        "PreToolUse hook denies editing pricing.py before RED and LL_GATE are recorded.",
+        "Runtime RED rejects a passing test and records a valid assertion failure, unlocking editing after gate declaration."
+      ],
+      "setup": [
+        "git init -q && git config user.email 'dev@example.com' && git config user.name 'Dev'",
+        "printf 'def discount(p):\n    return p - 1\n' > pricing.py",
+        "printf 'from pricing import discount\nassert discount(10) == 8\n' > test_pricing.py",
+        "printf 'legacy_note = 1\n' > legacy.py",
+        "git add pricing.py test_pricing.py legacy.py && git commit -q -m 'init'",
+        "printf 'legacy_note = 2\n' > legacy.py"
+      ],
+      "with_skill_actions": [
+        "mkdir -p \"${SANDBOX}/c1_bin\" && printf '#!/bin/sh\nif [ \"$1\" = \"models\" ]; then\n  echo \"gemini-4-carbon-high Gemini 4 Carbon (High)\"\n  echo \"gemini-4-neon-high Gemini 4 Neon (High)\"\n  echo \"gemini-4-argon-high Gemini 4 Argon (High)\"\n  echo \"gemini-4-hydrogen-high Gemini 4 Hydrogen (High)\"\n  echo \"gemini-3.8-flash-high Gemini 3.8 Flash (High)\"\n  echo \"claude-opus-5-5-high Claude Opus 5.5 (High)\"\n  echo \"claude-sonnet-5-5-high Claude Sonnet 5.5 (High)\"\n  echo \"gpt-oss-120b-medium GPT-OSS 120B (Medium)\"\n  exit 0\nfi\nexit 1\n' > \"${SANDBOX}/c1_bin/agy\" && chmod +x \"${SANDBOX}/c1_bin/agy\"",
+        "PATH=\"${SANDBOX}/c1_bin:${PATH}\" python3 \"${SKILL_DIR}/scripts/ledger.py\" --workspace \"${WORKSPACE}\" init --task 'Fix discount bug' --tier 2 --type Bugfix --author_model gemini-4-argon-high > \"${SANDBOX}/init_out.json\"",
+        "printf '{\"toolCall\":{\"name\":\"edit_file\",\"args\":{\"Path\":\"%s/pricing.py\"}},\"workspacePaths\":[\"%s\"]}' \"${WORKSPACE}\" \"${WORKSPACE}\" | python3 \"${SKILL_DIR}/../../plugins/ale-harness/scripts/pretool_gate.py\" --event PreToolUse > \"${SANDBOX}/pre_gate.json\"",
+        "python3 \"${SKILL_DIR}/scripts/red_gate.py\" --workspace \"${WORKSPACE}\" --test_cmd 'python3 -c \"exit(0)\"' > \"${SANDBOX}/red_green_reject.json\" 2>&1 || true",
+        "python3 \"${SKILL_DIR}/scripts/red_gate.py\" --workspace \"${WORKSPACE}\" --test_cmd 'python3 test_pricing.py'",
+        "python3 \"${SKILL_DIR}/scripts/ledger.py\" --workspace \"${WORKSPACE}\" gate --checked NONE --intent 'pricing.py subtracts 1; test expects 2; spec says 2'",
+        "printf '{\"toolCall\":{\"name\":\"edit_file\",\"args\":{\"Path\":\"%s/pricing.py\"}},\"workspacePaths\":[\"%s\"]}' \"${WORKSPACE}\" \"${WORKSPACE}\" | python3 \"${SKILL_DIR}/../../plugins/ale-harness/scripts/pretool_gate.py\" --event PreToolUse > \"${SANDBOX}/post_gate.json\""
+      ],
+      "baseline_actions": [
+        "printf 'def discount(p):\n    return p - 2\n' > pricing.py"
+      ],
+      "script_validators": [
+        {
+          "name": "pre_gate_blocked_and_baseline_dirty_captured",
+          "command": "grep -q '\"deny\"' \"${SANDBOX}/pre_gate.json\" && grep -q '\"baseline_dirty_files_count\": 1' \"${SANDBOX}/init_out.json\""
+        },
+        {
+          "name": "green_test_rejected_by_red_gate",
+          "command": "grep -q 'red_gate_rejected' \"${SANDBOX}/red_green_reject.json\""
+        },
+        {
+          "name": "post_gate_allowed_and_counterpart_paired",
+          "command": "grep -q '\"allow\"' \"${SANDBOX}/post_gate.json\" && python3 \"${SKILL_DIR}/scripts/ledger.py\" --workspace \"${WORKSPACE}\" status | grep -q 'claude-sonnet-5-5-high' && python3 \"${SKILL_DIR}/scripts/ledger.py\" --workspace \"${WORKSPACE}\" status | grep -q 'claude-opus-5-5-high'"
+        },
+        {
+          "name": "git_working_tree_unpolluted_by_ledger",
+          "command": "! find \"${WORKSPACE}\" -name 'ledger.json' -o -name 'SESSION_LL.md' | grep -q ."
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "friction-strike-breaker-and-lockout",
+      "prompt": "Resolve the recurring integer parser failure, switching to the latest counterpart on repeated friction and locking at three.",
+      "covers": ["CAP-04", "CAP-05", "CAP-06"],
+      "expectations": [
+        "Scoped 'regex-forbid: parser.py :: pattern' runs cleanly while retired Superseded invariants are skipped.",
+        "Second friction triggers CYCLE_2_STRIKE_BREAKER routed to the latest flagship Gemini model (gemini-4-neon-high), blocks run_command in review role, allows strike-breaker edits, and halts strike-breaker fallback if partial edits dirtied the workspace.",
+        "Third friction locks edits in PreToolUse."
+      ],
+      "setup": [
+        "git init -q && git config user.email 'dev@example.com' && git config user.name 'Dev'",
+        "printf 'def parse(s):\n    return int(s)\n' > parser.py",
+        "printf 'FORBIDDEN_IN_OTHER_FILE\n' > notes.txt",
+        "git add parser.py notes.txt && git commit -q -m 'init'"
+      ],
+      "with_skill_actions": [
+        "mkdir -p \"${SANDBOX}/c2_bin\" && printf '#!/bin/sh\nif [ \"$1\" = \"models\" ]; then\n  echo \"gemini-4-carbon-high Gemini 4 Carbon (High)\"\n  echo \"gemini-4-neon-high Gemini 4 Neon (High)\"\n  echo \"gemini-4-argon-high Gemini 4 Argon (High)\"\n  echo \"claude-opus-5-5-high Claude Opus 5.5 (High)\"\n  echo \"claude-sonnet-5-5-high Claude Sonnet 5.5 (High)\"\n  exit 0\nfi\nexit 1\n' > \"${SANDBOX}/c2_bin/agy\" && chmod +x \"${SANDBOX}/c2_bin/agy\"",
+        "PATH=\"${SANDBOX}/c2_bin:${PATH}\" python3 \"${SKILL_DIR}/scripts/ledger.py\" --workspace \"${WORKSPACE}\" init --task 'Fix parser' --tier 2 --type Bugfix --author_model claude-opus-5-5-high",
+        "python3 \"${SKILL_DIR}/scripts/ledger.py\" --workspace \"${WORKSPACE}\" friction --title 'Forbid token in parser.py only' --trigger 'parser.py' --assumption 'eval is safe' --root_cause 'Code injection risk' --invariant 'Never use forbidden token in parser.py' --check 'regex-forbid: parser.py :: FORBIDDEN_IN_OTHER_FILE' > \"${SANDBOX}/f1.json\"",
+        "python3 \"${SKILL_DIR}/scripts/red_gate.py\" --workspace \"${WORKSPACE}\" --verify_ll_only > \"${SANDBOX}/ll_verify.json\"",
+        "python3 \"${SKILL_DIR}/scripts/ledger.py\" --workspace \"${WORKSPACE}\" friction --title 'Obsolete rule' --trigger 'parser.py' --assumption 'Input is trimmed' --root_cause 'Trailing newline' --invariant 'Old rule' --check 'cmd: python3 -c \"exit(1)\"' > \"${SANDBOX}/f2.json\"",
+        "python3 \"${SKILL_DIR}/scripts/ledger.py\" --workspace \"${WORKSPACE}\" retire-ll --id SLL-002 --superseded_by SLL-001 > \"${SANDBOX}/retire.json\"",
+        "python3 \"${SKILL_DIR}/scripts/red_gate.py\" --workspace \"${WORKSPACE}\" --verify_ll_only > \"${SANDBOX}/ll_after_retire.json\"",
+        "printf '{\"toolCall\":{\"name\":\"edit_file\",\"args\":{\"Path\":\"%s/parser.py\"}},\"workspacePaths\":[\"%s\"]}' \"${WORKSPACE}\" \"${WORKSPACE}\" | ALE_SUBPROCESS_ROLE=strike-breaker python3 \"${SKILL_DIR}/../../plugins/ale-harness/scripts/pretool_gate.py\" --event PreToolUse > \"${SANDBOX}/sb_edit_gate.json\"",
+        "printf '{\"toolCall\":{\"name\":\"run_command\",\"args\":{\"CommandLine\":\"rm -rf /\"}},\"workspacePaths\":[\"%s\"]}' \"${WORKSPACE}\" | ALE_SUBPROCESS_ROLE=review python3 \"${SKILL_DIR}/../../plugins/ale-harness/scripts/pretool_gate.py\" --event PreToolUse > \"${SANDBOX}/rev_cmd_gate.json\"",
+        "PATH=\"${SANDBOX}/c2_bin:${PATH}\" python3 \"${SKILL_DIR}/scripts/model_router.py\" --workspace \"${WORKSPACE}\" --role strike-breaker --dry_run > \"${SANDBOX}/sb.json\"",
+        "mkdir -p \"${SANDBOX}/sb_bin\" && printf '#!/bin/sh\nif [ \"$1\" = \"models\" ]; then echo \"gemini-4-carbon-high Gemini 4 Carbon (High)\"; echo \"gemini-4-neon-high Gemini 4 Neon (High)\"; exit 0; fi\necho \"# partial edit\" >> parser.py\nexit 124\n' > \"${SANDBOX}/sb_bin/agy\" && chmod +x \"${SANDBOX}/sb_bin/agy\"",
+        "PATH=\"${SANDBOX}/sb_bin:${PATH}\" python3 \"${SKILL_DIR}/scripts/model_router.py\" --workspace \"${WORKSPACE}\" --role strike-breaker > \"${SANDBOX}/sb_dirty_halt.json\" 2>&1 || true",
+        "mkdir -p \"${SANDBOX}/nongit_ws\" && printf 'x = 1\n' > \"${SANDBOX}/nongit_ws/parser.py\" && PATH=\"${SANDBOX}/sb_bin:${PATH}\" python3 \"${SKILL_DIR}/scripts/ledger.py\" --workspace \"${SANDBOX}/nongit_ws\" init --task 'Non-git SB' --tier 2 --type Bugfix --author_model claude-opus-5-5-high > /dev/null && PATH=\"${SANDBOX}/sb_bin:${PATH}\" python3 \"${SKILL_DIR}/scripts/model_router.py\" --workspace \"${SANDBOX}/nongit_ws\" --role strike-breaker > \"${SANDBOX}/sb_nongit_halt.json\" 2>&1 || true",
+        "python3 \"${SKILL_DIR}/scripts/ledger.py\" --workspace \"${WORKSPACE}\" friction --title 'Third strike' --trigger 'parser.py' --assumption 'Hex supported' --root_cause 'Base 10 only' --invariant 'Pass base=0' --check 'cmd: python3 -c \"assert True\"' > \"${SANDBOX}/f3.json\"",
+        "printf '{\"toolCall\":{\"name\":\"edit_file\",\"args\":{\"Path\":\"%s/parser.py\"}},\"workspacePaths\":[\"%s\"]}' \"${WORKSPACE}\" \"${WORKSPACE}\" | python3 \"${SKILL_DIR}/../../plugins/ale-harness/scripts/pretool_gate.py\" --event PreToolUse > \"${SANDBOX}/locked_gate.json\""
+      ],
+      "baseline_actions": [
+        "printf 'def parse(s):\n    return int(s.strip())\n' > parser.py"
+      ],
+      "script_validators": [
+        {
+          "name": "scoped_regex_and_retired_ll_check_ran",
+          "command": "grep -q 'll_checks_passed' \"${SANDBOX}/ll_verify.json\" && grep -q 'retired' \"${SANDBOX}/retire.json\" && grep -q 'll_checks_passed' \"${SANDBOX}/ll_after_retire.json\""
+        },
+        {
+          "name": "cycle_2_routes_to_neon_and_guards_dirty_fallback",
+          "command": "grep -q 'CYCLE_2_STRIKE_BREAKER' \"${SANDBOX}/f2.json\" && grep -q 'gemini-4-neon-high' \"${SANDBOX}/sb.json\" && grep -q '\"allow\"' \"${SANDBOX}/sb_edit_gate.json\" && grep -q '\"deny\"' \"${SANDBOX}/rev_cmd_gate.json\" && grep -q 'halting fallback to prevent conflicting edits' \"${SANDBOX}/sb_dirty_halt.json\" && grep -q 'halting fallback to prevent conflicting edits' \"${SANDBOX}/sb_nongit_halt.json\""
+        },
+        {
+          "name": "cycle_3_locks_edits_in_hook",
+          "command": "grep -q 'CYCLE_3_ABORT' \"${SANDBOX}/f3.json\" && grep -q 'Friction Budget (3/3) exhausted' \"${SANDBOX}/locked_gate.json\""
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "cross-model-review-promotion-and-ship-gate",
+      "prompt": "Refactor the token authentication module with plan binding, full-packet cross-family review, SLL completion hygiene, and ship gate enforcement.",
+      "covers": ["CAP-07", "CAP-08", "CAP-09", "CAP-10"],
+      "expectations": [
+        "Plan SHA-256 is bound and full review_packet.md is written on review dispatch.",
+        "VERIFIED_WITH_CAVEATS containing a must-fix finding is rejected while zero must-fix passes and transitions ledger status to verified.",
+        "ruling --complete blocks while active SLL entries exist and succeeds only after promote-ll and dismiss-ll resolve them; Ship Gate blocks git push until ruling --allow_ship."
+      ],
+      "setup": [
+        "git init -q && git config user.email 'dev@example.com' && git config user.name 'Dev'",
+        "printf 'def check_token(t):\n    return bool(t)\n' > auth.py",
+        "printf '# Plan\n1. Constant-time compare\n' > plan.md",
+        "git add auth.py && git commit -q -m 'init'"
+      ],
+      "with_skill_actions": [
+        "python3 \"${SKILL_DIR}/scripts/ledger.py\" --workspace \"${WORKSPACE}\" init --task 'Refactor auth' --tier 3 --type Refactor --author_model gemini-4-argon-high",
+        "python3 \"${SKILL_DIR}/scripts/ledger.py\" --workspace \"${WORKSPACE}\" bind-plan --plan_file \"${WORKSPACE}/plan.md\" > \"${SANDBOX}/plan_bind.json\"",
+        "python3 \"${SKILL_DIR}/scripts/red_gate.py\" --workspace \"${WORKSPACE}\" --exempt --reason 'Pure refactor'",
+        "python3 \"${SKILL_DIR}/scripts/ledger.py\" --workspace \"${WORKSPACE}\" gate --checked NONE --intent 'Refactor token check'",
+        "printf 'import hmac\ndef check_token(t):\n    return hmac.compare_digest(t, \"secret\")\n' > auth.py",
+        "printf '{\"terminationReason\":\"NO_TOOL_CALL\",\"workspacePaths\":[\"%s\"]}' \"${WORKSPACE}\" | python3 \"${SKILL_DIR}/../../plugins/ale-harness/scripts/pretool_gate.py\" --event Stop > \"${SANDBOX}/stop_before.json\"",
+        "python3 -c 'import os, sys, time, pathlib; sys.path.insert(0, sys.argv[1] + \"/scripts\"); import ledger; sdir = ledger.get_session_dir(pathlib.Path(sys.argv[2])); d = ledger.load_ledger(sdir); d[\"dispatch_in_progress\"] = {\"role\": \"review\", \"model\": \"claude-opus-5-5-high\", \"pid\": os.getppid(), \"started_at\": time.time()}; ledger.save_ledger(sdir, d)' \"${SKILL_DIR}\" \"${WORKSPACE}\" && printf '{\"terminationReason\":\"NO_TOOL_CALL\",\"workspacePaths\":[\"%s\"]}' \"${WORKSPACE}\" | python3 \"${SKILL_DIR}/../../plugins/ale-harness/scripts/pretool_gate.py\" --event Stop > \"${SANDBOX}/stop_during_lease.json\"",
+        "python3 \"${SKILL_DIR}/scripts/ledger.py\" --workspace \"${WORKSPACE}\" friction --title 'Use compare_digest' --trigger 'auth.py' --assumption '== is safe' --root_cause 'Timing attack' --invariant 'Use hmac.compare_digest' --check 'cmd: python3 -c \"assert True\"'",
+        "python3 \"${SKILL_DIR}/scripts/ledger.py\" --workspace \"${WORKSPACE}\" friction --title 'Session-only typo' --trigger 'auth.py' --assumption 'Typo ok' --root_cause 'Typo' --invariant 'Check spelling' --check 'cmd: python3 -c \"assert True\"'",
+        "python3 \"${SKILL_DIR}/scripts/ledger.py\" --workspace \"${WORKSPACE}\" done --verify_cmd 'python3 -c \"import auth; assert auth.check_token(\\\"secret\\\")\"' --twins 'searched == in auth.py - found 0 sites'",
+        "mkdir -p \"${SANDBOX}/mf_bin\" && printf '#!/bin/sh\nif [ \"$1\" = \"models\" ]; then echo \"claude-opus-5-5-high Claude Opus 5.5 (High)\"; exit 0; fi\necho \"{\\\"status\\\":\\\"SUCCESS\\\",\\\"structured_output\\\":{\\\"verdict\\\":\\\"VERIFIED_WITH_CAVEATS\\\",\\\"summary\\\":\\\"must fix found\\\",\\\"findings\\\":[{\\\"axis\\\":\\\"ponytail-review\\\",\\\"severity\\\":\\\"must-fix\\\",\\\"file_or_surface\\\":\\\"auth.py\\\",\\\"issue\\\":\\\"bug\\\",\\\"smallest_fix\\\":\\\"fix\\\"}]}}\"\n' > \"${SANDBOX}/mf_bin/agy\" && chmod +x \"${SANDBOX}/mf_bin/agy\"",
+        "PATH=\"${SANDBOX}/mf_bin:${PATH}\" python3 \"${SKILL_DIR}/scripts/model_router.py\" --workspace \"${WORKSPACE}\" --role review > \"${SANDBOX}/review_must_fix.json\" 2>&1 || true",
+        "mkdir -p \"${SANDBOX}/sf_bin\" && printf '#!/bin/sh\nif [ \"$1\" = \"models\" ]; then echo \"claude-opus-5-5-high Claude Opus 5.5 (High)\"; exit 0; fi\necho \"{\\\"status\\\":\\\"SUCCESS\\\",\\\"structured_output\\\":{\\\"verdict\\\":\\\"VERIFIED_WITH_CAVEATS\\\",\\\"summary\\\":\\\"minor caveat\\\",\\\"findings\\\":[{\\\"axis\\\":\\\"ponytail-review\\\",\\\"severity\\\":\\\"should-fix\\\",\\\"file_or_surface\\\":\\\"auth.py\\\",\\\"issue\\\":\\\"minor\\\",\\\"smallest_fix\\\":\\\"polish\\\"}]}}\"\n' > \"${SANDBOX}/sf_bin/agy\" && chmod +x \"${SANDBOX}/sf_bin/agy\"",
+        "PATH=\"${SANDBOX}/sf_bin:${PATH}\" python3 \"${SKILL_DIR}/scripts/model_router.py\" --workspace \"${WORKSPACE}\" --role review > \"${SANDBOX}/review.json\"",
+        "printf '{\"terminationReason\":\"NO_TOOL_CALL\",\"workspacePaths\":[\"%s\"]}' \"${WORKSPACE}\" | python3 \"${SKILL_DIR}/../../plugins/ale-harness/scripts/pretool_gate.py\" --event Stop > \"${SANDBOX}/stop_after.json\"",
+        "python3 \"${SKILL_DIR}/scripts/ledger.py\" --workspace \"${WORKSPACE}\" ruling --complete > \"${SANDBOX}/complete_blocked.json\" 2>&1 || true",
+        "python3 \"${SKILL_DIR}/scripts/ledger.py\" --workspace \"${WORKSPACE}\" promote-ll --id SLL-001 --category ARCH > \"${SANDBOX}/promote.json\"",
+        "python3 \"${SKILL_DIR}/scripts/ledger.py\" --workspace \"${WORKSPACE}\" dismiss-ll --id SLL-002 --reason 'Session-only typo' > \"${SANDBOX}/dismiss.json\"",
+        "printf '{\"toolCall\":{\"name\":\"run_command\",\"args\":{\"CommandLine\":\"git push origin main\"}},\"workspacePaths\":[\"%s\"]}' \"${WORKSPACE}\" | python3 \"${SKILL_DIR}/../../plugins/ale-harness/scripts/pretool_gate.py\" --event PreToolUse > \"${SANDBOX}/ship_blocked.json\"",
+        "python3 \"${SKILL_DIR}/scripts/ledger.py\" --workspace \"${WORKSPACE}\" ruling --allow_ship --complete > \"${SANDBOX}/complete_ok.json\"",
+        "printf '{\"toolCall\":{\"name\":\"run_command\",\"args\":{\"CommandLine\":\"git push origin main\"}},\"workspacePaths\":[\"%s\"]}' \"${WORKSPACE}\" | python3 \"${SKILL_DIR}/../../plugins/ale-harness/scripts/pretool_gate.py\" --event PreToolUse > \"${SANDBOX}/ship_allowed.json\"",
+        "mkdir -p \"${SANDBOX}/bad_skill\" && printf 'path: /%s/someone/secret\n' 'home' > \"${SANDBOX}/bad_skill/SKILL.md\"",
+        "python3 \"${SKILL_DIR}/scripts/ledger.py\" check-portability \"${SANDBOX}/bad_skill\" > \"${SANDBOX}/portability_fail.json\" 2>&1 || true"
+      ],
+      "baseline_actions": [
+        "printf 'import hmac\ndef check_token(t):\n    return hmac.compare_digest(t, \"secret\")\n' > auth.py"
+      ],
+      "script_validators": [
+        {
+          "name": "plan_sha256_bound_and_packet_written",
+          "command": "grep -q 'plan_bound' \"${SANDBOX}/plan_bind.json\" && find \"${SANDBOX}\" -name 'review_packet.md' | grep -q review_packet.md"
+        },
+        {
+          "name": "must_fix_caveat_rejected_and_stop_lease_enforced",
+          "command": "grep -q '\"must_fix_count\": 1' \"${SANDBOX}/review_must_fix.json\" && grep -q '\"verdict\": \"VERIFIED_WITH_CAVEATS\"' \"${SANDBOX}/review_must_fix.json\" && grep -q '\"open_should_fix_count\": 1' \"${SANDBOX}/review.json\" && grep -q '\"continue\"' \"${SANDBOX}/stop_before.json\" && grep -q '\"allow\"' \"${SANDBOX}/stop_during_lease.json\" && grep -q '\"allow\"' \"${SANDBOX}/stop_after.json\" && grep -q '\"ledger_status\": \"verified\"' \"${SANDBOX}/review.json\""
+        },
+        {
+          "name": "sll_completion_hygiene_and_ship_gate_enforced",
+          "command": "grep -q 'completion_blocked' \"${SANDBOX}/complete_blocked.json\" && grep -q 'LL-ARCH-' \"${SANDBOX}/promote.json\" && grep -q 'dismissed' \"${SANDBOX}/dismiss.json\" && grep -q '\"completed\"' \"${SANDBOX}/complete_ok.json\" && grep -q '\"deny\"' \"${SANDBOX}/ship_blocked.json\" && grep -q '\"allow\"' \"${SANDBOX}/ship_allowed.json\""
+        },
+        {
+          "name": "portability_scanner_catches_hardcoded_home",
+          "command": "grep -q 'hardcoded-linux-home' \"${SANDBOX}/portability_fail.json\""
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "dynamic-latest-model-discovery-and-error-fallback",
+      "prompt": "Discover newly released host models dynamically for workers and counterparts, honor routing overrides, and fall back across families on quota error envelopes.",
+      "covers": ["CAP-11"],
+      "expectations": [
+        "Newly released models from agy models (such as Gemini 4 Neon and synthetic future Gemini 5 Nova / Claude Opus 6.0) are adopted automatically for Worker Roles and Counterpart Models without code changes.",
+        "model_routing.json overrides (exclude, pin_role) are respected while keeping cross-family collision guards intact.",
+        "When agy returns exit code 0 with an is_error JSON envelope (quota exhaustion), invoke_agy_model advances to the next fallback candidate instead of returning REFUTED."
+      ],
+      "setup": [
+        "git init -q && git config user.email 'dev@example.com' && git config user.name 'Dev'",
+        "printf 'def calc(x):\n    return x * 2\n' > service.py",
+        "git add service.py && git commit -q -m 'init'",
+        "printf 'def test_calc():\n    assert True\n' > test_untracked.py",
+        "printf '{\"content\":\"<USER_SETTINGS_CHANGE>The user changed setting `Model Selection` from None to Gemini 4 Neon (High).</USER_SETTINGS_CHANGE>\"}\n' > \"${SANDBOX}/mock_transcript.jsonl\""
+      ],
+      "with_skill_actions": [
+        "mkdir -p \"${SANDBOX}/future_bin\" && printf '#!/bin/sh\nif [ \"$1\" = \"models\" ]; then\n  echo \"gemini-4-carbon-high           Gemini 4 Carbon (High)\"\n  echo \"gemini-4-neon-high             Gemini 4 Neon (High)\"\n  echo \"gemini-5-nova-high             Gemini 5 Nova (High)\"\n  echo \"gemini-4-argon-high            Gemini 4 Argon (High)\"\n  echo \"gemini-4-hydrogen-high         Gemini 4 Hydrogen (High)\"\n  echo \"gemini-4-hydrogen-xhigh        Gemini 4 Hydrogen (XHigh)\"\n  echo \"gemini-4-flash-high            Gemini 4 Flash (High)\"\n  echo \"claude-opus-6-0-high           Claude Opus 6.0 (High)\"\n  echo \"claude-sonnet-6-0-high         Claude Sonnet 6.0 (High)\"\n  echo \"gpt-oss-120b-medium            GPT-OSS 120B (Medium)\"\n  exit 0\nfi\nif echo \"$*\" | grep -q \"claude-opus-6-0-high\"; then\n  echo \"[agy] warning: quota check\"\n  echo \"{\\\"is_error\\\":true,\\\"status\\\":\\\"ERROR\\\",\\\"error\\\":\\\"quota exhausted\\\"}\"\n  exit 0\nfi\necho \"{\\\"status\\\":\\\"SUCCESS\\\",\\\"structured_output\\\":{\\\"verdict\\\":\\\"VERIFIED\\\",\\\"summary\\\":\\\"fallback succeeded\\\",\\\"findings\\\":[]}}\"\n' > \"${SANDBOX}/future_bin/agy\" && chmod +x \"${SANDBOX}/future_bin/agy\"",
+        "PATH=\"${SANDBOX}/future_bin:${PATH}\" ALE_TRANSCRIPT_PATH=\"${SANDBOX}/mock_transcript.jsonl\" python3 \"${SKILL_DIR}/scripts/ledger.py\" --workspace \"${WORKSPACE}\" init --task 'Verify future model auto-adoption' --tier 2 --type Feature > \"${SANDBOX}/init_future.json\"",
+        "PATH=\"${SANDBOX}/future_bin:${PATH}\" python3 \"${SKILL_DIR}/scripts/model_router.py\" --workspace \"${WORKSPACE}\" --role models > \"${SANDBOX}/models_future.json\"",
+        "PATH=\"${SANDBOX}/future_bin:${PATH}\" ALE_TRANSCRIPT_PATH=\"${SANDBOX}/mock_transcript.jsonl\" python3 \"${SKILL_DIR}/scripts/model_router.py\" --workspace \"${WORKSPACE}\" --role research --dry_run > \"${SANDBOX}/research_future.json\"",
+        "PATH=\"${SANDBOX}/future_bin:${PATH}\" ALE_TRANSCRIPT_PATH=\"${SANDBOX}/mock_transcript.jsonl\" python3 \"${SKILL_DIR}/scripts/model_router.py\" --workspace \"${WORKSPACE}\" --role fast-exec --dry_run > \"${SANDBOX}/fast_exec_future.json\"",
+        "PATH=\"${SANDBOX}/future_bin:${PATH}\" ALE_TRANSCRIPT_PATH=\"${SANDBOX}/mock_transcript.jsonl\" python3 \"${SKILL_DIR}/scripts/model_router.py\" --workspace \"${WORKSPACE}\" --role review > \"${SANDBOX}/review_fallback_live.json\"",
+        "printf '{\"exclude\":[\"gemini-5-nova-*\"],\"pin_role\":{\"research\":\"gemini-4-hydrogen-high\"}}\n' > \"${ALE_OUTPUT_ROOT}/model_routing.json\"",
+        "PATH=\"${SANDBOX}/future_bin:${PATH}\" python3 \"${SKILL_DIR}/scripts/model_router.py\" --workspace \"${WORKSPACE}\" --role models > \"${SANDBOX}/models_overridden.json\"",
+        "PATH=\"${SANDBOX}/future_bin:${PATH}\" ALE_TRANSCRIPT_PATH=\"${SANDBOX}/mock_transcript.jsonl\" python3 \"${SKILL_DIR}/scripts/model_router.py\" --workspace \"${WORKSPACE}\" --role research --dry_run > \"${SANDBOX}/research_pinned.json\"",
+        "rm -f \"${ALE_OUTPUT_ROOT}/model_routing.json\"",
+        "ALE_OUTPUT_ROOT=\"${SANDBOX}\" python3 -c 'import sys, pathlib; sys.path.insert(0, sys.argv[1] + \"/scripts\"); import ledger, model_router; schema = pathlib.Path(sys.argv[1]) / \"templates/review-verdict.schema.json\"; cmd = model_router.build_agy_command(\"agy\", \"claude-opus-5-5-high\", \"hi\", pathlib.Path(\"/tmp/prod_ws\"), schema); code, _, _ = model_router.invoke_agy_model(\"claude-opus-5-5-high\", \"hi\", pathlib.Path(\"/tmp/prod_ws\"), schema, dry_run=True, output_dir=sys.argv[2]); git_ctx = model_router.collect_git_diff_context(pathlib.Path(sys.argv[3]), \"HEAD\"); m_neon = ledger.normalize_model_id(\"Gemini 4 Neon (High)\"); m_orch_neon = ledger.normalize_model_id(\"Orchestrator (Neon)\"); print({\"has_json_fmt\": \"--output-format\" in cmd and \"json\" in cmd, \"prod_dry_run_code\": code, \"untracked_ok\": \"test_untracked.py\" in git_ctx, \"neon\": m_neon, \"orch_neon\": m_orch_neon})' \"${SKILL_DIR}\" \"${SANDBOX}\" \"${WORKSPACE}\" > \"${SANDBOX}/cli_and_guard_check.txt\""
+      ],
+      "baseline_actions": [
+        "printf 'no model router executed\n' > \"${SANDBOX}/baseline_noop.txt\""
+      ],
+      "script_validators": [
+        {
+          "name": "future_models_auto_adopted_for_workers_and_counterparts",
+          "command": "grep -q '\"gemini_flagship\": \"gemini-5-nova-high\"' \"${SANDBOX}/models_future.json\" && grep -q '\"claude_flagship\": \"claude-opus-6-0-high\"' \"${SANDBOX}/models_future.json\" && grep -q '\"model\": \"gemini-4-flash-high\"' \"${SANDBOX}/research_future.json\" && grep -q '\"model\": \"gemini-4-hydrogen-xhigh\"' \"${SANDBOX}/fast_exec_future.json\""
+        },
+        {
+          "name": "exit0_error_envelope_triggers_cross_family_fallback",
+          "command": "grep -q '\"status\": \"review_passed\"' \"${SANDBOX}/review_fallback_live.json\" && grep -q '\"model\": \"claude-sonnet-6-0-high\"' \"${SANDBOX}/review_fallback_live.json\" && grep -q 'claude-opus-6-0-high' \"${SANDBOX}/review_fallback_live.json\""
+        },
+        {
+          "name": "routing_config_exclude_and_pin_role_applied",
+          "command": "grep -q '\"gemini_flagship\": \"gemini-4-neon-high\"' \"${SANDBOX}/models_overridden.json\" && grep -q '\"model\": \"gemini-4-hydrogen-high\"' \"${SANDBOX}/research_pinned.json\""
+        },
+        {
+          "name": "neon_normalization_untracked_and_prod_dry_run_guard",
+          "command": "grep -q \"'has_json_fmt': True\" \"${SANDBOX}/cli_and_guard_check.txt\" && grep -q \"'prod_dry_run_code': 2\" \"${SANDBOX}/cli_and_guard_check.txt\" && grep -q \"'untracked_ok': True\" \"${SANDBOX}/cli_and_guard_check.txt\" && grep -q \"'neon': 'gemini-4-neon-high'\" \"${SANDBOX}/cli_and_guard_check.txt\" && grep -q \"'orch_neon': 'gemini-pro-orchestrator-neon'\" \"${SANDBOX}/cli_and_guard_check.txt\""
+        }
+      ]
+    }
+  ]
+}

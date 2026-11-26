@@ -1,6 +1,6 @@
 # Active Session Lessons Learned (SESSION_LL)
 
-> Task-scoped memory buffer maintained by `/ale`. Used to prevent repeating mistakes during the active task loop.
+> Task-scoped memory buffer maintained by `/ale` under `$HOME/tmp/ale_harness/<workspace_slug>/SESSION_LL.md`.
 
 ---
 
@@ -11,5 +11,5 @@
 - **False Assumption**: `<The flawed premise, hallucinated API, or incorrect belief that led to the error>`
 - **Root Cause**: `<The objective technical truth / underlying invariant discovered>`
 - **Invariant**: `<Enforceable, positive directive for all subsequent code generations>`
-- **Verification Check**: `<Exact bash command, linter run, or regex pattern to verify adherence>`
+- **Verification Check**: `<cmd: exact shell command | regex-forbid: pattern>`
 - **Status**: Active | Resolved
